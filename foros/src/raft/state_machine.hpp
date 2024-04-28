@@ -58,6 +58,8 @@ class StateMachine : public common::StateMachine<State, StateType, Event>,
   StateType get_current_state() override;
 
   const std::shared_ptr<Context> context_;
+
+  void get_type1()
 };
 
 }  // namespace raft
