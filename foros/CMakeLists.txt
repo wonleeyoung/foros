@@ -14,7 +14,11 @@ find_package(rclcpp REQUIRED)
 find_package(foros_msgs REQUIRED)
 find_package(leveldb REQUIRED)
 
-include_directories(src)
+#include_directories(src)
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src  # 이 부분을 추가해야 할 수 있습니다.
+)
 
 set(${PROJECT_NAME}_SRCS
   src/cluster_node.cpp
@@ -43,7 +47,7 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SRCS})
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
+    $<INSTALL_INTERFACE:include>) 
 
 ament_target_dependencies(${PROJECT_NAME}
   rclcpp

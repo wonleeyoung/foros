@@ -16,6 +16,7 @@
 
 #include "lifecycle/state/standby.hpp"
 
+
 namespace akit {
 namespace failover {
 namespace foros {

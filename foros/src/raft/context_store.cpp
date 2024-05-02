@@ -61,7 +61,7 @@ bool ContextStore::current_term(const uint64_t term) {
   current_term_ = term;
 
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+    //RCLCPP_ERROR(logger_, "db is nullptr");
     return false;
   }
 
@@ -109,7 +109,7 @@ bool ContextStore::voted_for(const uint32_t id) {
   voted_for_ = id;
 
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+    //RCLCPP_ERROR(logger_, "db is nullptr");
     return false;
   }
 
@@ -156,7 +156,7 @@ bool ContextStore::voted(const bool voted) {
   voted_ = voted;
 
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+    //RCLCPP_ERROR(logger_, "db is nullptr");
     return false;
   }
   leveldb::Slice value(reinterpret_cast<const char *>(&voted), sizeof(bool));
@@ -237,7 +237,7 @@ uint64_t ContextStore::logs_size() const {
 
 uint64_t ContextStore::load_logs_size() {
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+    //RCLCPP_ERROR(logger_, "db is nullptr");
     return 0;
   }
 
@@ -263,7 +263,7 @@ uint64_t ContextStore::load_logs_size() {
 
 bool ContextStore::store_logs_size(const uint64_t size) {
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+    //RCLCPP_ERROR(logger_, "db is nullptr");
     return false;
   }
 
@@ -294,7 +294,7 @@ void ContextStore::init_logs() {
 
 LogEntry::SharedPtr ContextStore::load_log(const uint64_t id) {
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+    //RCLCPP_ERROR(logger_, "db is nullptr");
     return nullptr;
   }
 
@@ -326,7 +326,7 @@ LogEntry::SharedPtr ContextStore::load_log(const uint64_t id) {
 
 bool ContextStore::store_log_term(const uint64_t id, const uint64_t term) {
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+   // RCLCPP_ERROR(logger_, "db is nullptr");
     return false;
   }
 
@@ -344,7 +344,7 @@ bool ContextStore::store_log_term(const uint64_t id, const uint64_t term) {
 bool ContextStore::store_log_data(const uint64_t id,
                                   std::vector<uint8_t> data) {
   if (db_ == nullptr) {
-    RCLCPP_ERROR(logger_, "db is nullptr");
+   // RCLCPP_ERROR(logger_, "db is nullptr");
     return false;
   }
 

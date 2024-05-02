@@ -17,7 +17,7 @@ class SensorNode : public rclcpp::Node {
 public:
     SensorNode(int sensor_id) : Node("sensor_node_" + std::to_string(sensor_id)), sensor_id_(sensor_id) {
         publisher_ = this->create_publisher<std_msgs::msg::String>("sensoring", 10);
-        timer_ = this->create_wall_timer(2ms, std::bind(&SensorNode::timer_callback, this));
+        timer_ = this->create_wall_timer(200ms, std::bind(&SensorNode::timer_callback, this));
     }
 
 private:

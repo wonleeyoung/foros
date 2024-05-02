@@ -15,10 +15,8 @@
  */
 
 #include "raft/other_node.hpp"
-
 #include <memory>
 #include <string>
-
 #include "common/node_util.hpp"
 
 namespace akit {

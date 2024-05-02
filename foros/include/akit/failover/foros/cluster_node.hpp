@@ -49,6 +49,14 @@
 #include "akit/failover/foros/command.hpp"
 #include "akit/failover/foros/common.hpp"
 
+
+
+
+//#include "raft/context.hpp"
+//#include "raft/context_store.hpp"
+//#include "raft/state_machine.hpp"
+//#include "raft/state_machine_interface.hpp"
+
 namespace akit {
 namespace failover {
 namespace foros {
@@ -1093,11 +1101,84 @@ class ClusterNode : public std::enable_shared_from_this<ClusterNode>,
    */
   CLUSTER_NODE_PUBLIC
   bool is_activated() final;
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool is_candidate();
 
+
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool is_candidate_from_raft();
   /// Register the acitvated callback.
   /**
    * \param[in] callback The callback to register.
    */
+
+
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool is_leader();
+
+
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool is_standby();
+
+  
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool is_follower();
+
+  
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool is_stay();
+
+/// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool life_inactive();
+  /// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool life_standby();
+  /// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool life_active();
+  /// Check whether the node is activated or not.
+  /**
+   * \return true if the node is activated, false if not.
+   */
+  CLUSTER_NODE_PUBLIC
+  bool life_unknown();
+
+ 
+  
   CLUSTER_NODE_PUBLIC
   void register_on_activated(std::function<void()> callback);
 
@@ -1154,6 +1235,8 @@ class ClusterNode : public std::enable_shared_from_this<ClusterNode>,
    */
   CLUSTER_NODE_PUBLIC
   void register_on_reverted(std::function<void(const uint64_t)> callback);
+
+
 
  private:
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_;

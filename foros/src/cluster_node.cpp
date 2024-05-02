@@ -16,6 +16,8 @@
 
 #include "akit/failover/foros/cluster_node.hpp"
 
+
+
 #include <rclcpp/node_interfaces/node_base.hpp>
 #include <rclcpp/node_interfaces/node_clock.hpp>
 #include <rclcpp/node_interfaces/node_graph.hpp>
@@ -34,6 +36,16 @@
 #include "akit/failover/foros/cluster_node_options.hpp"
 #include "cluster_node_impl.hpp"
 #include "common/node_util.hpp"
+
+
+// 삭제용
+#include "raft/context.hpp"
+#include "raft/context_store.hpp"
+#include "raft/state_machine.hpp"
+#include "raft/state_machine_interface.hpp"
+
+
+
 
 namespace akit {
 namespace failover {
@@ -331,6 +343,26 @@ ClusterNode::get_node_waitables_interface() {
 
 bool ClusterNode::is_activated() { return impl_->is_activated(); }
 
+bool ClusterNode::is_candidate() { return impl_->is_candidate(); }
+
+bool ClusterNode::is_candidate_from_raft() {
+  return impl_->is_candidate_from_raft();
+}
+
+bool ClusterNode::is_leader() { return impl_->is_leader(); }
+
+bool ClusterNode::is_standby() { return impl_->is_standby(); }
+
+bool ClusterNode::is_follower() { return impl_->is_follower(); }
+bool ClusterNode::is_stay() { return impl_->is_stay(); }
+
+bool ClusterNode::life_inactive() { return impl_->life_inactive(); }
+bool ClusterNode::life_standby() { return impl_->life_standby(); }
+bool ClusterNode::life_active() { return impl_->life_active(); }
+bool ClusterNode::life_unknown() { return impl_->life_unknown(); }
+
+
+
 void ClusterNode::register_on_activated(std::function<void()> callback) {
   impl_->register_on_activated(callback);
 }
@@ -363,6 +395,13 @@ void ClusterNode::register_on_reverted(
     std::function<void(const uint64_t)> callback) {
   impl_->register_on_reverted(callback);
 }
+
+// akit::failover::foros::common::StateMachine get_current_state() {
+//   return impl_->get_current_state();
+// }
+
+
+
 
 }  // namespace foros
 }  // namespace failover

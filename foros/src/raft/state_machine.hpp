@@ -30,7 +30,7 @@
 #include "raft/state/candidate.hpp"
 #include "raft/state/follower.hpp"
 #include "raft/state/leader.hpp"
-#include "raft/state/standby.hpp"
+#include "raft/state/standby.hpp" 
 #include "raft/state_machine_interface.hpp"
 #include "raft/state_type.hpp"
 
@@ -59,7 +59,7 @@ class StateMachine : public common::StateMachine<State, StateType, Event>,
 
   const std::shared_ptr<Context> context_;
 
-  void get_type1()
+
 };
 
 }  // namespace raft

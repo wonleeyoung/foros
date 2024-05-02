@@ -109,6 +109,56 @@ bool ClusterNodeImpl::is_activated() {
          lifecycle::StateType::kActive;
 }
 
+bool ClusterNodeImpl::is_candidate() {
+  return lifecycle_fsm_->get_current_state_type() == 
+         lifecycle::StateType::kStandby;
+}
+
+bool ClusterNodeImpl::is_candidate_from_raft() {
+  return raft_fsm_->get_current_state_type() == 
+         raft::StateType::kCandidate;
+}
+
+bool ClusterNodeImpl::is_leader() {
+  return raft_fsm_->get_current_state_type() == raft::StateType::kLeader;
+}
+
+bool ClusterNodeImpl::is_standby() {
+  return raft_fsm_->get_current_state_type() == 
+         raft::StateType::kStandby;
+}
+
+bool ClusterNodeImpl::is_follower() {
+  return raft_fsm_->get_current_state_type() == 
+         raft::StateType::kFollower;
+}
+
+bool ClusterNodeImpl::is_stay() {
+  return raft_fsm_->get_current_state_type() == 
+         raft::StateType::kStay;
+}
+
+bool ClusterNodeImpl::life_inactive() {
+  return lifecycle_fsm_->get_current_state_type() == 
+         lifecycle::StateType::kInactive;
+}
+
+bool ClusterNodeImpl::life_standby() {
+  return lifecycle_fsm_->get_current_state_type() == 
+         lifecycle::StateType::kStandby;
+}
+
+bool ClusterNodeImpl::life_active() {
+  return lifecycle_fsm_->get_current_state_type() == 
+         lifecycle::StateType::kActive;
+}
+
+bool ClusterNodeImpl::life_unknown() {
+  return lifecycle_fsm_->get_current_state_type() == 
+         lifecycle::StateType::kUnknown;
+}
+
+
 CommandCommitResponseSharedFuture ClusterNodeImpl::commit_command(
     Command::SharedPtr command, CommandCommitResponseCallback &callback) {
   return raft_context_->commit_command(command, callback);
@@ -155,6 +205,12 @@ void ClusterNodeImpl::register_on_reverted(
     std::function<void(const uint64_t)> callback) {
   raft_context_->register_on_reverted(callback);
 }
+
+akit::failover::foros::raft::StateType ClusterNodeImpl::get_current_state() {
+  return raft_fsm_->get_current_state_type();
+
+}
+
 
 }  // namespace foros
 }  // namespace failover

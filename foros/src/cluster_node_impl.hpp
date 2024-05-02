@@ -66,21 +66,42 @@ class ClusterNodeImpl final : Observer<lifecycle::StateType>,
   void handle(const lifecycle::StateType &state) override;
   void handle(const raft::StateType &state) override;
   bool is_activated();
+  bool is_candidate();
+  bool is_candidate_from_raft();
+  bool is_leader();
+  bool is_standby();
+  bool is_follower();
+  bool is_stay();
+
+  bool life_inactive();
+  bool life_standby();
+  bool life_active();
+  bool life_unknown();
+
+
+
+
   void register_on_activated(std::function<void()> callback);
   void register_on_deactivated(std::function<void()> callback);
   void register_on_standby(std::function<void()> callback);
   CommandCommitResponseSharedFuture commit_command(
       Command::SharedPtr command, CommandCommitResponseCallback &callback);
   uint64_t get_commands_size();
+
   Command::SharedPtr get_command(uint64_t id);
+
   void register_on_committed(
       std::function<void(const uint64_t, Command::SharedPtr)> callback);
   void register_on_reverted(std::function<void(const uint64_t)> callback);
+
+
+  akit::failover::foros::raft::StateType get_current_state();   
 
  private:
   void set_activated_callback(std::function<void()> callback);
   void set_deactivated_callback(std::function<void()> callback);
   void set_standby_callback(std::function<void()> callback);
+  //akit::failover::foros::raft::StateType get_current_state();
 
   rclcpp::Logger logger_;
   std::shared_ptr<raft::Context> raft_context_;
