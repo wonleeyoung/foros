@@ -53,13 +53,39 @@ class OtherNode {
                                     const uint64_t, const bool)>
                      callback);
 
-  bool request_vote(const uint64_t current_term, const uint32_t node_id,
-                    const LogEntry::SharedPtr log,
-                    std::function<void(const uint64_t, const bool)> callback);
+
+  /// original code 
+//   bool request_vote(const uint64_t current_term, const uint32_t node_id,
+//                     const LogEntry::SharedPtr log,
+//                     std::function<void(const uint64_t, const bool)> callback);
+
+
+  //syc renew
+    //syc renew
+      //syc renew
+        //syc renew
+          //syc renew
+bool request_vote(
+    const uint64_t current_term, const uint32_t node_id,
+    const LogEntry::SharedPtr log, const std::vector<std::string>& candidate_data,
+    std::function<void(const uint64_t, const bool)> callback);
+
+
+ void copy_data_from_candidate(const std::vector<std::string>& data); ///syc
+ RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str()  );
+  //syc renew
+    //syc renew
+      //syc renew
+        //syc renew
+          //syc renew
+
+
+
 
   void update_match_index(const uint64_t match_index);
-
+   
  private:
+  std::vector<std::string> candidate_data; //////syc
   void send_append_entries(
       const foros_msgs::srv::AppendEntries::Request::SharedPtr request,
       std::function<void(const uint32_t, const uint64_t, const uint64_t,
@@ -78,6 +104,7 @@ class OtherNode {
       get_log_entry_callback_;
 
   std::mutex index_mutex_;
+
 };
 
 }  // namespace raft

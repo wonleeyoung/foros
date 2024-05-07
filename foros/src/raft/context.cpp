@@ -365,12 +365,40 @@ void Context::broadcast() {
 }
 
 void Context::request_vote() {
+
+
+  // //original 
+  // //original 
+  // //original 
+  // //original 
+  // for (auto &node : other_nodes_) {
+  //   node.second->request_vote(
+  //       store_->current_term(), node_id_, store_->log(), entry_buffer,
+  //       std::bind(&Context::on_request_vote_response, this,
+  //                 std::placeholders::_1, std::placeholders::_2));
+  // }
+  // //original 
+  // //original 
+  // //original 
+  // //original 
+ 
+
+ //syc///
+ //syc///
+ //syc///
   for (auto &node : other_nodes_) {
     node.second->request_vote(
-        store_->current_term(), node_id_, store_->log(),
+        store_->current_term(), node_id_, store_->log(), entry_buffer ,
         std::bind(&Context::on_request_vote_response, this,
                   std::placeholders::_1, std::placeholders::_2));
   }
+
+ //syc///
+ //syc///
+ //syc///
+ //syc///
+
+
   
   RCLCPP_INFO(logger_, "Request vote for term\n %lu", store_->current_term());
   //RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str());
@@ -668,8 +696,8 @@ std::string Context::read_entry_buffer() {
     if (!result.empty()) {
         result.pop_back();  // 마지막 공백 제거
     }
-    return entry_buffer.back();
-    //return result;
+    //return entry_buffer.back();
+   return result;
 }
 void Context::insert_entry_buffer(const std::string& data) {
   entry_buffer.push_back(data);
