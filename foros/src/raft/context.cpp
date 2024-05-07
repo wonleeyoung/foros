@@ -372,9 +372,9 @@ void Context::request_vote() {
                   std::placeholders::_1, std::placeholders::_2));
   }
   
-  RCLCPP_INFO(logger_, "Request vote for term %lu", store_->current_term());
-  RCLCPP_INFO(logger_, "entry buffer: %s", this->read_entry_buffer().c_str());
-  
+  RCLCPP_INFO(logger_, "Request vote for term\n %lu", store_->current_term());
+  //RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str());
+  RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str()  );
 
   check_elected();
 }
@@ -668,7 +668,8 @@ std::string Context::read_entry_buffer() {
     if (!result.empty()) {
         result.pop_back();  // 마지막 공백 제거
     }
-    return result;
+    return entry_buffer.back();
+    //return result;
 }
 void Context::insert_entry_buffer(const std::string& data) {
   entry_buffer.push_back(data);
