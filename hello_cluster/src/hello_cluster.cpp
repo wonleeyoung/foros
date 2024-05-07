@@ -195,7 +195,10 @@ int main(int argc, char **argv) {
     {
         std::lock_guard<std::mutex> lock(node->mutex_);
         sub_data = node->data;
+        
     }
+    node->insert_entry_buffer(sub_data);
+    
 
     node->insert_entry_buffer(sub_data);
 
@@ -210,6 +213,7 @@ int main(int argc, char **argv) {
   rclcpp::shutdown();
 
   // wonyeong
+  //seungyeon
   return 0;
 }
 
