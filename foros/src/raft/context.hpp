@@ -87,7 +87,23 @@ class Context {
       std::function<void(const uint64_t, Command::SharedPtr)> callback);
   void register_on_reverted(std::function<void(const uint64_t)> callback);
 
+
+  /////////////////syc/ ///////////////
+    std::string read_entry_buffer();
+    void insert_entry_buffer(const std::string& data);
+    void reset_entry_buffer();
+
  private:
+
+    //syc////////////////
+   std::vector<std::string> entry_buffer; //syc//////////////////////////////
+    //syc////////////////
+
+
+
+
+
+
   void initialize_node();
   void initialize_other_nodes(const std::vector<uint32_t> &cluster_node_ids);
   void set_cluster_size(uint32_t size);
@@ -147,6 +163,7 @@ class Context {
 
   const std::string cluster_name_;
   uint32_t node_id_;
+  
 
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_;
   rclcpp::node_interfaces::NodeGraphInterface::SharedPtr node_graph_;
