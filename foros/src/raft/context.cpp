@@ -309,6 +309,7 @@ void Context::reset_broadcast_timer() {
 
 void Context::vote_for_me() {
   store_->voted_for(node_id_);
+
   store_->voted(true);
   store_->increase_vote_received();
 }
@@ -370,8 +371,14 @@ void Context::request_vote() {
         std::bind(&Context::on_request_vote_response, this,
                   std::placeholders::_1, std::placeholders::_2));
   }
+  
+  RCLCPP_INFO(logger_, "Request vote for term %lu", store_->current_term());
+  RCLCPP_INFO(logger_, "entry buffer: %s", this->read_entry_buffer().c_str());
+
+
   check_elected();
 }
+
 
 void Context::on_request_vote_response(const uint64_t term,
                                        const bool vote_granted) {
@@ -650,6 +657,30 @@ void Context::inspector_message_requested(
       break;
   }
 }
+
+////////// syc
+/// syc
+std::string Context::read_entry_buffer() {
+    std::string result;
+    for (const auto& entry : entry_buffer) {
+        result += entry + " ";  // 요소들 사이에 공백을 추가하여 구분
+    }
+    if (!result.empty()) {
+        result.pop_back();  // 마지막 공백 제거
+    }
+    return result;
+}
+void Context::insert_entry_buffer(const std::string& data) {
+  entry_buffer.push_back(data);
+}
+
+void Context::reset_entry_buffer() {
+  entry_buffer.clear();
+}
+/// syc
+/// syc
+/// syc
+
 
 }  // namespace raft
 }  // namespace foros

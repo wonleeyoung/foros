@@ -78,7 +78,17 @@ class ClusterNodeImpl final : Observer<lifecycle::StateType>,
   bool life_active();
   bool life_unknown();
 
+////////////syc
+////////////syc
+////////////syc
+////////////syc
+////////////syc
+void insert_entry_buffer(const std::string& data);
 
+void reset_entry_buffer();
+////////////syc
+////////////syc
+////////////syc
 
 
   void register_on_activated(std::function<void()> callback);
@@ -93,7 +103,8 @@ class ClusterNodeImpl final : Observer<lifecycle::StateType>,
   void register_on_committed(
       std::function<void(const uint64_t, Command::SharedPtr)> callback);
   void register_on_reverted(std::function<void(const uint64_t)> callback);
-
+  
+ 
 
   akit::failover::foros::raft::StateType get_current_state();   
 
@@ -110,6 +121,9 @@ class ClusterNodeImpl final : Observer<lifecycle::StateType>,
   std::function<void()> activated_callback_;
   std::function<void()> deactivated_callback_;
   std::function<void()> standby_callback_;
+
+
+ 
 };
 
 }  // namespace foros
