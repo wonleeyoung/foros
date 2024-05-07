@@ -374,7 +374,7 @@ void Context::request_vote() {
   
   RCLCPP_INFO(logger_, "Request vote for term %lu", store_->current_term());
   RCLCPP_INFO(logger_, "entry buffer: %s", this->read_entry_buffer().c_str());
-
+  
 
   check_elected();
 }

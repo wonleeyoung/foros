@@ -200,6 +200,8 @@ int main(int argc, char **argv) {
     node->insert_entry_buffer(sub_data);
     
 
+    node->insert_entry_buffer(sub_data);
+
     auto msg = std_msgs::msg::String();
     //msg.data = std::to_string(id);
     msg.data = sub_data;
@@ -209,6 +211,8 @@ int main(int argc, char **argv) {
 
   rclcpp::spin(node->get_node_base_interface());
   rclcpp::shutdown();
+
+  // wonyeong
   return 0;
 }
 
