@@ -110,6 +110,8 @@ ClusterNode::~ClusterNode() {
   node_graph_.reset();
 }
 
+ 
+
 const char *ClusterNode::get_name() const { return node_base_->get_name(); }
 
 const char *ClusterNode::get_namespace() const {
@@ -396,9 +398,21 @@ void ClusterNode::register_on_reverted(
   impl_->register_on_reverted(callback);
 }
 
-// akit::failover::foros::common::StateMachine get_current_state() {
-//   return impl_->get_current_state();
-// }
+
+
+/// syc///////////////////////
+/// syc///////////////////////
+void ClusterNode::insert_entry_buffer(const std::string& data) {
+  impl_->insert_entry_buffer(data);
+}
+
+void ClusterNode::reset_entry_buffer() {
+  impl_->reset_entry_buffer();
+}
+ 
+/// syc///////////////////////
+/// syc///////////////////////
+
 
 
 

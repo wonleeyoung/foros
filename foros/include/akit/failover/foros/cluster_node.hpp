@@ -1236,6 +1236,18 @@ class ClusterNode : public std::enable_shared_from_this<ClusterNode>,
   CLUSTER_NODE_PUBLIC
   void register_on_reverted(std::function<void(const uint64_t)> callback);
 
+   /// insert data in entry buffer of candidate
+  /**
+   * \param[in] data  The callback to register
+   */
+  CLUSTER_NODE_PUBLIC
+
+  /// reset data in entry buffer of candidate
+  /**
+   * 
+   */
+  void insert_entry_buffer(const std::string& data);
+  void reset_entry_buffer();
 
 
  private:

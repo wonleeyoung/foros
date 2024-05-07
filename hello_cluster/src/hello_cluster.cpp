@@ -36,10 +36,29 @@ private:
     void sensor_data_callback(const std_msgs::msg::String::SharedPtr msg) {
         try {
 
-           
+            // 여기에 leader인 경우에만 받게끔하자.
+            /*
+            if (this->is_activated()){
+                std::lock_guard<std::mutex> lock(mutex_); // lock 획득 시도
+
+                auto received_data = json::parse(msg->data);
+                data = received_data["data"];
+                
+                RCLCPP_INFO(this->get_logger(), "Received sensor data: %s", data.c_str());
+                // Verify data - Example: Check if the data contains expected string
+                if (data.find("Dummy data from sensor") != std::string::npos) {
+                    RCLCPP_INFO(this->get_logger(), "Data verified successfully: %s", data.c_str());
+                } else {
+                    RCLCPP_ERROR(this->get_logger(), "Data verification failed: %s", data.c_str());
+                }
+                data = data + " from leader node " + std::to_string(c_id);
+
+            }
+            */
            
             if(this->is_candidate_from_raft()){
                 RCLCPP_INFO(this->get_logger(), "candidate ");
+                this->insert_entry_buffer("123131231321");
             }
 
             if(this->is_standby()){
@@ -59,10 +78,25 @@ private:
             }
             
             
+/*
+            if(this->life_active()){
+               RCLCPP_INFO(this->get_logger(), "active ");
+            }
 
+            if(this->life_standby()){
+                RCLCPP_INFO(this->get_logger(), "standby ");
+            }
 
+            if(this->life_inactive()){
+                RCLCPP_INFO(this->get_logger(), "inactive ");
+            }
 
-            if (true){
+            if(this->life_unknown()){
+                RCLCPP_INFO(this->get_logger(), "unknown ");
+            }
+*/
+ 
+            if ( this->is_leader() ){
                 std::lock_guard<std::mutex> lock(mutex_); // lock 획득 시도
 
                 auto received_data = json::parse(msg->data);
@@ -78,7 +112,23 @@ private:
                 data = data + " from leader node " + std::to_string(c_id);
 
             }
-            
+
+            if ( this->is_candidate_from_raft() ){
+                std::lock_guard<std::mutex> lock(mutex_); // lock 획득 시도
+
+                auto received_data = json::parse(msg->data);
+                data = received_data["data"];
+                
+                //RCLCPP_INFO(this->get_logger(), "Received sensor data: %s", data.c_str());
+                // Verify data - Example: Check if the data contains expected string
+                if (data.find("Dummy data from sensor") != std::string::npos) {
+                    RCLCPP_INFO(this->get_logger(), "Data verified successfully: %s", data.c_str());
+                } else {
+                    RCLCPP_ERROR(this->get_logger(), "Data verification failed: %s", data.c_str());
+                }
+                data = data + " from leader node " + std::to_string(c_id);
+
+            }
            
 
         } catch (const json::parse_error& e) {
@@ -158,3 +208,100 @@ int main(int argc, char **argv) {
   rclcpp::shutdown();
   return 0;
 }
+
+/*
+
+#include <chrono>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include "akit/failover/foros/cluster_node.hpp"
+#include <nlohmann/json.hpp>
+using namespace std::chrono_literals;
+using json = nlohmann::json;
+
+class HelloCluster : public akit::failover::foros::ClusterNode {
+public:
+    HelloCluster(const std::string& cluster_name, uint32_t node_id, const std::vector<uint32_t>& node_ids)
+    : ClusterNode(cluster_name, node_id, node_ids) {
+        sensor_subscriber_ = this->create_subscription<std_msgs::msg::String>(
+            "sensoring", 10, std::bind(&HelloCluster::sensor_data_callback, this, std::placeholders::_1));
+        RCLCPP_INFO(this->get_logger(), "HelloCluster Node initialized and listening on sensoring topic");
+    }
+
+private:
+    void sensor_data_callback(const std_msgs::msg::String::SharedPtr msg) {
+        try {
+
+            // 여기에 leader인 경우에만 받게끔하자.
+            if (this->is_activated()){
+                auto received_data = json::parse(msg->data);
+                std::string data = received_data["data"];
+                RCLCPP_INFO(this->get_logger(), "Received sensor data: %s", data.c_str());
+                // Verify data - Example: Check if the data contains expected string
+                if (data.find("Dummy data from sensor") != std::string::npos) {
+                    RCLCPP_INFO(this->get_logger(), "Data verified successfully: %s", data.c_str());
+                } else {
+                    RCLCPP_ERROR(this->get_logger(), "Data verification failed: %s", data.c_str());
+                }
+            }
+
+
+//            auto received_data = json::parse(msg->data);
+//            std::string data = received_data["data"];
+//            RCLCPP_INFO(this->get_logger(), "Received sensor data: %s", data.c_str());
+//            // Verify data - Example: Check if the data contains expected string
+//            if (data.find("Dummy data from sensor") != std::string::npos) {
+//                RCLCPP_INFO(this->get_logger(), "Data verified successfully: %s", data.c_str());
+//            } else {
+//                RCLCPP_ERROR(this->get_logger(), "Data verification failed: %s", data.c_str());
+//            }
+        } catch (const json::parse_error& e) {
+            RCLCPP_ERROR(this->get_logger(), "JSON parsing error: '%s'", e.what());
+        }
+    }
+
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sensor_subscriber_;
+};
+
+int main(int argc, char **argv) {
+  const std::string kClusterName = "hello_cluster";
+  const std::string kTopicName = "hello_cluster";
+  const std::vector<uint32_t> kClusterNodeIds = {0, 1, 2};
+
+  rclcpp::Logger logger = rclcpp::get_logger("hello_cluster_node");
+  logger.set_level(rclcpp::Logger::Level::Info);
+
+  if (argc < 2) {
+    RCLCPP_ERROR(logger, "Usage : %s {node ID} {size of cluster}", argv[0]);
+    return -1;
+  }
+
+  uint32_t id = std::stoul(argv[1]);
+  if (find(kClusterNodeIds.begin(), kClusterNodeIds.end(), id) ==
+      kClusterNodeIds.end()) {
+    RCLCPP_ERROR(logger, "Node ID must be among 0, 1, 2");
+    return -1;
+  }
+
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<HelloCluster>(kClusterName, id, kClusterNodeIds);
+
+
+
+  auto publisher = node->create_publisher<std_msgs::msg::String>(kTopicName, 3);
+  auto timer_ = node->create_wall_timer(1s, [&]() {
+    auto msg = std_msgs::msg::String();
+    msg.data = std::to_string(id);
+    publisher->publish(msg);
+    RCLCPP_INFO(logger, "Publishing cluster message: %s", msg.data.c_str());
+  });
+
+  rclcpp::spin(node->get_node_base_interface());
+  rclcpp::shutdown();
+  return 0;
+}
+
+*/
