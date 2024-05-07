@@ -657,7 +657,7 @@ void Context::inspector_message_requested(
       break;
   }
 }
-
+ 
 ////////// syc
 /// syc
 std::string Context::read_entry_buffer() {

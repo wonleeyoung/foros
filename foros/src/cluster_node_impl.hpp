@@ -103,7 +103,7 @@ void reset_entry_buffer();
   void register_on_committed(
       std::function<void(const uint64_t, Command::SharedPtr)> callback);
   void register_on_reverted(std::function<void(const uint64_t)> callback);
-  
+   
  
 
   akit::failover::foros::raft::StateType get_current_state();   

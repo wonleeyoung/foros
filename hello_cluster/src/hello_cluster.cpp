@@ -58,7 +58,7 @@ private:
            
             if(this->is_candidate_from_raft()){
                 RCLCPP_INFO(this->get_logger(), "candidate ");
-                this->insert_entry_buffer("123131231321");
+                //this->insert_entry_buffer("123131231321");
             }
 
             if(this->is_standby()){
@@ -195,7 +195,10 @@ int main(int argc, char **argv) {
     {
         std::lock_guard<std::mutex> lock(node->mutex_);
         sub_data = node->data;
+        
     }
+    node->insert_entry_buffer(sub_data);
+    
 
     auto msg = std_msgs::msg::String();
     //msg.data = std::to_string(id);
