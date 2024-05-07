@@ -55,6 +55,11 @@ OtherNode::OtherNode(
   node_services->add_client(
       std::dynamic_pointer_cast<rclcpp::ClientBase>(request_vote_), nullptr);
 }
+//////////////////syc
+
+void OtherNode::copy_data_from_candidate(const std::vector<std::string>& data) {
+  candidate_data = data;  // 벡터의 내용을 복사
+}
 
 bool OtherNode::broadcast(const uint64_t current_term, const uint32_t node_id,
                           const LogEntry::SharedPtr log,
@@ -128,13 +133,59 @@ void OtherNode::send_append_entries(
       });
 }
 
+
+// //originallllll
+// //originallllll
+// //originallllll
+// //originallllll
+// bool OtherNode::request_vote(
+//     const uint64_t current_term, const uint32_t node_id,
+//     const LogEntry::SharedPtr log,
+//     std::function<void(const uint64_t, const bool)> callback) {
+
+
+//   if (request_vote_->service_is_ready() == false) {
+//     return false;
+//   }
+
+//   auto request = std::make_shared<foros_msgs::srv::RequestVote::Request>();
+//   request->term = current_term;
+//   request->candidate_id = node_id;
+//   request->last_data_index = log == nullptr ? 0 : log->id_;
+//   request->loat_data_term = log == nullptr ? 0 : log->term_;
+//   auto response = request_vote_->async_send_request(
+//       request,
+//       [=](rclcpp::Client<foros_msgs::srv::RequestVote>::SharedFutureWithRequest
+//               future) {
+//         auto ret = future.get();
+//         auto response = ret.second;
+//         callback(response->term, response->vote_granted);
+//       });
+
+//   return true;
+// }
+// //originallllll
+// //originallllll
+// //originallllll
+// //originallllll
+
+//syc/////////////////
+//syc/////////////////
+//syc/////////////////
+//syc/////////////////
+
 bool OtherNode::request_vote(
     const uint64_t current_term, const uint32_t node_id,
-    const LogEntry::SharedPtr log,
+    const LogEntry::SharedPtr log,const std::vector<std::string>& candidate_data,
     std::function<void(const uint64_t, const bool)> callback) {
+
+  copy_data_from_candidate(candidate_data); // 벡터 데이터 복사
   if (request_vote_->service_is_ready() == false) {
     return false;
   }
+
+  RCLCPP_INFO(logger_, "entry buffer: \n%s", this.candidate  );
+
 
   auto request = std::make_shared<foros_msgs::srv::RequestVote::Request>();
   request->term = current_term;
@@ -152,6 +203,17 @@ bool OtherNode::request_vote(
 
   return true;
 }
+
+
+//syc/////////////////
+//syc/////////////////
+//syc/////////////////
+//syc/////////////////
+//syc/////////////////
+
+
+
+
 
 void OtherNode::update_match_index(const uint64_t match_index) {
   set_match_index(match_index);
