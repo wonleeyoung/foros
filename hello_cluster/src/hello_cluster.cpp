@@ -36,25 +36,6 @@ private:
     void sensor_data_callback(const std_msgs::msg::String::SharedPtr msg) {
         try {
 
-            // 여기에 leader인 경우에만 받게끔하자.
-            /*
-            if (this->is_activated()){
-                std::lock_guard<std::mutex> lock(mutex_); // lock 획득 시도
-
-                auto received_data = json::parse(msg->data);
-                data = received_data["data"];
-                
-                RCLCPP_INFO(this->get_logger(), "Received sensor data: %s", data.c_str());
-                // Verify data - Example: Check if the data contains expected string
-                if (data.find("Dummy data from sensor") != std::string::npos) {
-                    RCLCPP_INFO(this->get_logger(), "Data verified successfully: %s", data.c_str());
-                } else {
-                    RCLCPP_ERROR(this->get_logger(), "Data verification failed: %s", data.c_str());
-                }
-                data = data + " from leader node " + std::to_string(c_id);
-
-            }
-            */
            
             if(this->is_candidate_from_raft()){
                 //RCLCPP_INFO(this->get_logger(), "candidate ");
@@ -79,24 +60,7 @@ private:
                 RCLCPP_INFO(this->get_logger(), "leader ");
             }
             
-            
-/*
-            if(this->life_active()){
-               RCLCPP_INFO(this->get_logger(), "active ");
-            }
 
-            if(this->life_standby()){
-                RCLCPP_INFO(this->get_logger(), "standby ");
-            }
-
-            if(this->life_inactive()){
-                RCLCPP_INFO(this->get_logger(), "inactive ");
-            }
-
-            if(this->life_unknown()){
-                RCLCPP_INFO(this->get_logger(), "unknown ");
-            }
-*/
  
             if ( this->is_leader() ){
                 std::lock_guard<std::mutex> lock(mutex_); // lock 획득 시도
@@ -199,7 +163,7 @@ int main(int argc, char **argv) {
         sub_data = node->data;
         
     }
-    node->insert_entry_buffer(sub_data);
+    //node->insert_entry_buffer(sub_data);
     
     auto msg = std_msgs::msg::String();
     //msg.data = std::to_string(id);

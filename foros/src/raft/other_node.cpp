@@ -57,7 +57,7 @@ OtherNode::OtherNode(
 }
 //////////////////syc
 
-void OtherNode::copy_data_from_candidate(const std::vector<std::string>& data) {
+void OtherNode::copy_data_from_candidate(const std::vector<u_int32_t>& data) {
   candidate_data = data;  // 벡터의 내용을 복사
 }
 
@@ -176,7 +176,7 @@ void OtherNode::send_append_entries(
 
 bool OtherNode::request_vote(
     const uint64_t current_term, const uint32_t node_id,
-    const LogEntry::SharedPtr log,const std::vector<std::string>& candidate_data,
+    const LogEntry::SharedPtr log,const uint64_t election_timeout, const std::vector<u_int32_t>& candidate_data,
     std::function<void(const uint64_t, const bool)> callback) {
 
   copy_data_from_candidate(candidate_data); // 벡터 데이터 복사
@@ -184,7 +184,7 @@ bool OtherNode::request_vote(
     return false;
   }
 
-  RCLCPP_INFO(logger_, "entry buffer: \n%s", this.candidate  );
+  //RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str());
 
 
   auto request = std::make_shared<foros_msgs::srv::RequestVote::Request>();
@@ -192,6 +192,9 @@ bool OtherNode::request_vote(
   request->candidate_id = node_id;
   request->last_data_index = log == nullptr ? 0 : log->id_;
   request->loat_data_term = log == nullptr ? 0 : log->term_;
+  request->election_timeout = election_timeout;
+  request->data_array = candidate_data; // 벡터 데이터 전달
+
   auto response = request_vote_->async_send_request(
       request,
       [=](rclcpp::Client<foros_msgs::srv::RequestVote>::SharedFutureWithRequest

@@ -214,13 +214,13 @@ akit::failover::foros::raft::StateType ClusterNodeImpl::get_current_state() {
 //syc////////////////
 //syc////////////////
 //syc////////////////
-void  ClusterNodeImpl::insert_entry_buffer(const std::string& data) {
- raft_context_->insert_entry_buffer(data);
-}
+// void  ClusterNodeImpl::insert_entry_buffer(const std::string& data) {
+//  raft_context_->insert_entry_buffer(data);
+// }
 
-void  ClusterNodeImpl::reset_entry_buffer() {
- raft_context_->reset_entry_buffer();
-}
+// void  ClusterNodeImpl::reset_entry_buffer() {
+//  raft_context_->reset_entry_buffer();
+// }
 
 //syc////////////////
 //syc////////////////

@@ -67,12 +67,13 @@ class OtherNode {
           //syc renew
 bool request_vote(
     const uint64_t current_term, const uint32_t node_id,
-    const LogEntry::SharedPtr log, const std::vector<std::string>& candidate_data,
+    const LogEntry::SharedPtr log, const uint64_t election_timeout, const std::vector<u_int32_t>& candidate_data,
     std::function<void(const uint64_t, const bool)> callback);
 
 
- void copy_data_from_candidate(const std::vector<std::string>& data); ///syc
- RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str()  );
+ void copy_data_from_candidate(const std::vector<u_int32_t>& data); ///syc
+ //RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str() );
+
   //syc renew
     //syc renew
       //syc renew
@@ -85,7 +86,7 @@ bool request_vote(
   void update_match_index(const uint64_t match_index);
    
  private:
-  std::vector<std::string> candidate_data; //////syc
+  std::vector<u_int32_t> candidate_data; //////syc
   void send_append_entries(
       const foros_msgs::srv::AppendEntries::Request::SharedPtr request,
       std::function<void(const uint32_t, const uint64_t, const uint64_t,

@@ -26,6 +26,8 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <algorithm>
+#include <mutex>
 
 #include "common/node_util.hpp"
 #include "common/void_callback.hpp"
@@ -231,19 +233,51 @@ void Context::request_local_rollback(const uint64_t commit_index) {
   store_->revert_log(commit_index);
 }
 
+
 void Context::on_request_vote_requested(
     const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<foros_msgs::srv::RequestVote::Request> request,
     std::shared_ptr<foros_msgs::srv::RequestVote::Response> response) {
+  
+  
+  //wywywywywywywy 수정
+  
+  
   if (is_valid_node(request->candidate_id) == false) {
     return;
   }
 
-  update_term(request->term);
-  std::tie(response->term, response->vote_granted) =
-      vote(request->term, request->candidate_id, request->last_data_index,
-           request->loat_data_term);
+  pending_votes.push_back(request);
+  if (!timer_active) {
+    timer_active = true;
+    std::thread([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(600)); // 600ms 기다림
+  
+      }).detach();
+      {
+      std::lock_guard<std::mutex> lock(vote_mutex);
+      std::sort(pending_votes.begin(), pending_votes.end(), [](const auto& a, const auto& b) {
+        return a->election_timeout < b->election_timeout;
+      });
+      
+      auto min_timeout_request = pending_votes.front();
+      // 여기까지 pending votes를 정렬하고 가장 작은 timeout을 가진 request를 가져옴
+      // 이제 이 request를 이용하여 vote를 진행
+      update_term(min_timeout_request->term);
+      std::tie(response->term, response->vote_granted) =
+          vote(min_timeout_request->term, min_timeout_request->candidate_id,
+           min_timeout_request->last_data_index, min_timeout_request->loat_data_term);
+      timer_active = false;
+      }
+  }
+  
+  // update_term(request->term);
+  // std::tie(response->term, response->vote_granted) =
+  //     vote(request->term, request->candidate_id, request->last_data_index,
+  //          request->loat_data_term);
 }
+
+
 
 void Context::start_election_timer() {
   if (election_timer_ != nullptr) {
@@ -254,6 +288,14 @@ void Context::start_election_timer() {
   std::uniform_int_distribution<> dist(election_timeout_min_,
                                        election_timeout_max_);
   auto period = dist(random_generator_);
+  
+  //wywywywywy
+  //wywywywywy
+  //wywywywywy
+  //wywywywywy
+  // 후보 election timeout 시간을 출력
+  current_election_timeout_ = period;
+  RCLCPP_INFO(logger_, "Election timer period: %d", period);
 
   election_timer_ = rclcpp::GenericTimer<rclcpp::VoidCallbackType>::make_shared(
       node_clock_->get_clock(), std::chrono::milliseconds(period),
@@ -365,44 +407,16 @@ void Context::broadcast() {
 }
 
 void Context::request_vote() {
-
-
-  // //original 
-  // //original 
-  // //original 
-  // //original 
-  // for (auto &node : other_nodes_) {
-  //   node.second->request_vote(
-  //       store_->current_term(), node_id_, store_->log(), entry_buffer,
-  //       std::bind(&Context::on_request_vote_response, this,
-  //                 std::placeholders::_1, std::placeholders::_2));
-  // }
-  // //original 
-  // //original 
-  // //original 
-  // //original 
- 
-
- //syc///
- //syc///
- //syc///
   for (auto &node : other_nodes_) {
     node.second->request_vote(
-        store_->current_term(), node_id_, store_->log(), entry_buffer ,
+        store_->current_term(), node_id_, store_->log(), current_election_timeout_,  entry_buffer,
         std::bind(&Context::on_request_vote_response, this,
                   std::placeholders::_1, std::placeholders::_2));
   }
-
- //syc///
- //syc///
- //syc///
- //syc///
-
-
   
-  RCLCPP_INFO(logger_, "Request vote for term\n %lu", store_->current_term());
+  //RCLCPP_INFO(logger_, "Request vote for term\n %lu", store_->current_term());
   //RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str());
-  RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str()  );
+  //RCLCPP_INFO(logger_, "entry buffer: \n%s", this->read_entry_buffer().c_str()  );
 
   check_elected();
 }
@@ -688,24 +702,24 @@ void Context::inspector_message_requested(
  
 ////////// syc
 /// syc
-std::string Context::read_entry_buffer() {
-    std::string result;
-    for (const auto& entry : entry_buffer) {
-        result += entry + " ";  // 요소들 사이에 공백을 추가하여 구분
-    }
-    if (!result.empty()) {
-        result.pop_back();  // 마지막 공백 제거
-    }
-    //return entry_buffer.back();
-   return result;
-}
-void Context::insert_entry_buffer(const std::string& data) {
-  entry_buffer.push_back(data);
-}
+// std::string Context::read_entry_buffer() {
+//     std::string result;
+//     for (const auto& entry : entry_buffer) {
+//         result += entry + " ";  // 요소들 사이에 공백을 추가하여 구분
+//     }
+//     if (!result.empty()) {
+//         result.pop_back();  // 마지막 공백 제거
+//     }
+//     return entry_buffer.back();
+//     //return result;
+// }
+// void Context::insert_entry_buffer(const std::string& data) {
+//   entry_buffer.push_back(data);
+// }
 
-void Context::reset_entry_buffer() {
-  entry_buffer.clear();
-}
+// void Context::reset_entry_buffer() {
+//   entry_buffer.clear();
+// }
 /// syc
 /// syc
 /// syc

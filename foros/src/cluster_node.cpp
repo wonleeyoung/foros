@@ -402,13 +402,13 @@ void ClusterNode::register_on_reverted(
 
 /// syc///////////////////////
 /// syc///////////////////////
-void ClusterNode::insert_entry_buffer(const std::string& data) {
-  impl_->insert_entry_buffer(data);
-}
+// void ClusterNode::insert_entry_buffer(const std::string& data) {
+//   impl_->insert_entry_buffer(data);
+// }
 
-void ClusterNode::reset_entry_buffer() {
-  impl_->reset_entry_buffer();
-}
+// void ClusterNode::reset_entry_buffer() {
+//   impl_->reset_entry_buffer();
+// }
  
 /// syc///////////////////////
 /// syc///////////////////////

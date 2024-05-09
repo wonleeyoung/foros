@@ -83,9 +83,9 @@ class ClusterNodeImpl final : Observer<lifecycle::StateType>,
 ////////////syc
 ////////////syc
 ////////////syc
-void insert_entry_buffer(const std::string& data);
+// void insert_entry_buffer(const std::string& data);
 
-void reset_entry_buffer();
+// void reset_entry_buffer();
 ////////////syc
 ////////////syc
 ////////////syc

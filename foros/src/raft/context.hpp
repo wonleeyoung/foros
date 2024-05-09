@@ -35,6 +35,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 #include "akit/failover/foros/command.hpp"
 #include "raft/commit_info.hpp"
@@ -89,14 +90,14 @@ class Context {
 
 
   /////////////////syc/ ///////////////
-    std::string read_entry_buffer();
-    void insert_entry_buffer(const std::string& data);
-    void reset_entry_buffer();
+    // std::string read_entry_buffer();
+    // void insert_entry_buffer(const std::string& data);
+    // void reset_entry_buffer();
 
  private:
 
     //syc////////////////
-   std::vector<std::string> entry_buffer; //syc//////////////////////////////
+   std::vector<u_int32_t> entry_buffer; //syc//////////////////////////////
     //syc////////////////
 
 
@@ -188,6 +189,19 @@ class Context {
   uint32_t cluster_size_;              // number of nodes in the cluster
   unsigned int election_timeout_min_;  // minimum election timeout in msecs
   unsigned int election_timeout_max_;  // maximum election timeout in msecs
+
+  // wywywywywywywy
+  // wywywywywywywy
+  unsigned int current_election_timeout_;  // current election timeout
+  bool timer_active = false;
+  std::vector<std::shared_ptr<foros_msgs::srv::RequestVote::Request>> pending_votes;
+  std::mutex vote_mutex;
+
+
+
+
+
+
   std::random_device random_device_;   // random seed for election timeout
   std::mt19937 random_generator_;      // random generator for election timeout
   rclcpp::TimerBase::SharedPtr election_timer_;  // election timeout timer
