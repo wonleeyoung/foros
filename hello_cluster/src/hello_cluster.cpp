@@ -130,7 +130,7 @@ private:
 int main(int argc, char **argv) {
   const std::string kClusterName = "hello_cluster";
   const std::string kTopicName = "hello_cluster";
-  const std::vector<uint32_t> kClusterNodeIds = {0, 1, 2, 3, 4};
+  const std::vector<uint32_t> kClusterNodeIds = {0, 1, 2, 3, 4, 5};
 
   rclcpp::Logger logger = rclcpp::get_logger("hello_cluster_node");
   logger.set_level(rclcpp::Logger::Level::Info);

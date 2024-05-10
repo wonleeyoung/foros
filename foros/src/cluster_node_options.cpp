@@ -27,8 +27,8 @@ namespace foros {
 
 ClusterNodeOptions::ClusterNodeOptions(rcl_allocator_t allocator)
     : NodeOptions(allocator),
-      election_timeout_min_(150),
-      election_timeout_max_(3001),
+      election_timeout_min_(300),
+      election_timeout_max_(600),
       temp_directory_(std::filesystem::temp_directory_path()) {}
 
 unsigned int ClusterNodeOptions::election_timeout_min() const {

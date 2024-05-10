@@ -93,7 +93,8 @@ class Context {
     // std::string read_entry_buffer();
     // void insert_entry_buffer(const std::string& data);
     // void reset_entry_buffer();
-
+  void handle_request_vote(const std::shared_ptr<foros_msgs::srv::RequestVote::Request> request,
+                                  std::shared_ptr<foros_msgs::srv::RequestVote::Response> response);
  private:
 
     //syc////////////////

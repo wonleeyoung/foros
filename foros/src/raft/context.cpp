@@ -238,43 +238,42 @@ void Context::on_request_vote_requested(
     const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<foros_msgs::srv::RequestVote::Request> request,
     std::shared_ptr<foros_msgs::srv::RequestVote::Response> response) {
-  
-  
-  //wywywywywywywy 수정
-  
-  
-  if (is_valid_node(request->candidate_id) == false) {
-    return;
-  }
 
-  pending_votes.push_back(request);
-  if (!timer_active) {
-    timer_active = true;
-    std::thread([this]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(600)); // 600ms 기다림
-  
-      }).detach();
-      {
-      std::lock_guard<std::mutex> lock(vote_mutex);
-      std::sort(pending_votes.begin(), pending_votes.end(), [](const auto& a, const auto& b) {
-        return a->election_timeout < b->election_timeout;
-      });
+      std::thread(&Context::handle_request_vote, this, request, response).join();
       
-      auto min_timeout_request = pending_votes.front();
-      // 여기까지 pending votes를 정렬하고 가장 작은 timeout을 가진 request를 가져옴
-      // 이제 이 request를 이용하여 vote를 진행
-      update_term(min_timeout_request->term);
-      std::tie(response->term, response->vote_granted) =
-          vote(min_timeout_request->term, min_timeout_request->candidate_id,
-           min_timeout_request->last_data_index, min_timeout_request->loat_data_term);
-      timer_active = false;
-      }
-  }
-  
-  // update_term(request->term);
-  // std::tie(response->term, response->vote_granted) =
-  //     vote(request->term, request->candidate_id, request->last_data_index,
-  //          request->loat_data_term);
+}
+
+
+void Context::handle_request_vote(const std::shared_ptr<foros_msgs::srv::RequestVote::Request> request,
+                                  std::shared_ptr<foros_msgs::srv::RequestVote::Response> response) {
+    if (is_valid_node(request->candidate_id) == false) {
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(vote_mutex);
+        pending_votes.push_back(request);
+    }
+
+    if (!timer_active) {
+        timer_active = true;
+    
+        std::this_thread::sleep_for(std::chrono::milliseconds(75));
+        
+        std::lock_guard<std::mutex> lock(vote_mutex);
+        std::sort(pending_votes.begin(), pending_votes.end(), [](const auto& a, const auto& b) {
+            return a->election_timeout < b->election_timeout;
+        });
+        
+        RCLCPP_INFO(logger_, "Pending votes: %ld", pending_votes.size());
+        auto min_timeout_request = pending_votes.front();
+        update_term(min_timeout_request->term);
+        std::tie(response->term, response->vote_granted) = vote(min_timeout_request->term, min_timeout_request->candidate_id,
+                                                                min_timeout_request->last_data_index, min_timeout_request->loat_data_term);
+        timer_active = false;
+        pending_votes.clear();
+        
+    }
 }
 
 
