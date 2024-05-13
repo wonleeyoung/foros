@@ -238,8 +238,18 @@ void Context::on_request_vote_requested(
     const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<foros_msgs::srv::RequestVote::Request> request,
     std::shared_ptr<foros_msgs::srv::RequestVote::Response> response) {
+        RCLCPP_INFO(logger_, "follower, timer_active : \n %d", timer_active);
 
-      std::thread(&Context::handle_request_vote, this, request, response).join();
+
+      if (timer_active) {
+        //std::thread(&Context::handle_request_vote, this, request, response).detach();
+        handle_request_vote(request, response);
+      }
+      else {
+        handle_request_vote(request, response);
+        ///std::thread(&Context::handle_request_vote, this, request, response).detach();
+      
+      }
       
 }
 
@@ -249,29 +259,60 @@ void Context::handle_request_vote(const std::shared_ptr<foros_msgs::srv::Request
     if (is_valid_node(request->candidate_id) == false) {
         return;
     }
-
-    {
-        std::lock_guard<std::mutex> lock(vote_mutex);
+    if (timer_active){
+        
         pending_votes.push_back(request);
+        std::unique_lock<std::mutex> lock(vote_mutex);
+        cv.wait(lock, [&] { return ready; });
+        if (request_id == request->candidate_id) {
+          update_term(request->term);
+          std::tie(response->term, response->vote_granted) = vote(request->term, request->candidate_id,
+                                                                request->last_data_index, request->loat_data_term);
+        }
+
+        else {
+          response->term = request->term;
+          response->vote_granted = false;
+        }
     }
 
-    if (!timer_active) {
+    else if (!timer_active) {
+        pending_votes.clear();
         timer_active = true;
-    
+        pending_votes.push_back(request);
         std::this_thread::sleep_for(std::chrono::milliseconds(75));
         
         std::lock_guard<std::mutex> lock(vote_mutex);
+        
         std::sort(pending_votes.begin(), pending_votes.end(), [](const auto& a, const auto& b) {
-            return a->election_timeout < b->election_timeout;
+          if (a->term != b->term) {
+            return a->term > b->term; // term이 더 큰 것이 앞으로 오도록
+          }
+          // term이 같은 경우, election_timeout을 오름차순으로 비교
+          return a->election_timeout < b->election_timeout;
         });
         
         RCLCPP_INFO(logger_, "Pending votes: %ld", pending_votes.size());
         auto min_timeout_request = pending_votes.front();
-        update_term(min_timeout_request->term);
-        std::tie(response->term, response->vote_granted) = vote(min_timeout_request->term, min_timeout_request->candidate_id,
+        request_id = min_timeout_request->candidate_id;
+        RCLCPP_INFO(logger_, "id: %d", request_id);
+        if (request_id == request->candidate_id){
+          update_term(min_timeout_request->term);
+           std::tie(response->term, response->vote_granted) = vote(min_timeout_request->term, min_timeout_request->candidate_id,
                                                                 min_timeout_request->last_data_index, min_timeout_request->loat_data_term);
+        }
+
+        else {
+          response->term = request->term;
+          response->vote_granted = false;
+        }
+
+        ready = true;
         timer_active = false;
-        pending_votes.clear();
+        cv.notify_all();
+        ready = false;
+
+        
         
     }
 }

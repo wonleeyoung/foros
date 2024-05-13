@@ -128,6 +128,7 @@ private:
 };
 
 int main(int argc, char **argv) {
+     
   const std::string kClusterName = "hello_cluster";
   const std::string kTopicName = "hello_cluster";
   const std::vector<uint32_t> kClusterNodeIds = {0, 1, 2, 3, 4, 5};
@@ -151,6 +152,10 @@ int main(int argc, char **argv) {
   auto node = std::make_shared<HelloCluster>(kClusterName, id, kClusterNodeIds);
   auto publisher = node->create_publisher<std_msgs::msg::String>(kTopicName, 3);
 
+  unsigned int num_threads = std::thread::hardware_concurrency();
+  rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), num_threads);
+  executor.add_node(node->get_node_base_interface());
+
   // 타이머 안에서 node의 subscription data를 가져온다.
 
   auto timer_duration_ms = std::stoi(argv[2]);
@@ -172,7 +177,7 @@ int main(int argc, char **argv) {
     //RCLCPP_INFO(logger, "Publishing cluster message: %s", msg.data.c_str());
   });
 
-  rclcpp::spin(node->get_node_base_interface());
+  executor.spin();
   rclcpp::shutdown();
 
   // wonyeong

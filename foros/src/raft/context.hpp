@@ -36,6 +36,7 @@
 #include <tuple>
 #include <vector>
 #include <algorithm>
+#include <condition_variable>
 
 #include "akit/failover/foros/command.hpp"
 #include "raft/commit_info.hpp"
@@ -197,11 +198,10 @@ class Context {
   bool timer_active = false;
   std::vector<std::shared_ptr<foros_msgs::srv::RequestVote::Request>> pending_votes;
   std::mutex vote_mutex;
-
-
-
-
-
+  std::condition_variable cv;
+  unsigned int request_id = 30000;
+  bool ready = false;
+  
 
   std::random_device random_device_;   // random seed for election timeout
   std::mt19937 random_generator_;      // random generator for election timeout
